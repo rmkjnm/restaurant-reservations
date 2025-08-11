@@ -1,9 +1,9 @@
-// Auto-detect backend URL 
+// Auto-detect backend URL based on environment
 const API_BASE =
   import.meta.env.VITE_API_URL ||
   (window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
-    : 'https://restaurant-reservations-r6tq.onrender.com'); // Change later domain's API
+    : 'https://restaurant-reservations-r6tq.onrender.com'); // Change later to your domain's API
 
 async function fetchJSON(url, options) {
   const res = await fetch(url, options);
