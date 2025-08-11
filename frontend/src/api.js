@@ -1,43 +1,46 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Auto-detect backend URL 
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://restaurant-reservations-r6tq.onrender.com'); // Change later domain's API
 
-export async function getConfig() {
-  const res = await fetch(`${API_BASE}/config`);
+async function fetchJSON(url, options) {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+  }
   return res.json();
 }
 
-export async function checkAvailability({ date, meal, timeSlot, partySize 
-}) {
+export async function getConfig() {
+  return fetchJSON(`${API_BASE}/config`);
+}
+
+export async function checkAvailability({ date, meal, timeSlot, partySize }) {
   const params = new URLSearchParams({ date, meal, timeSlot });
   if (partySize) params.set('partySize', partySize);
-  const res = await 
-fetch(`${API_BASE}/availability?${params.toString()}`);
-  return res.json();
+  return fetchJSON(`${API_BASE}/availability?${params.toString()}`);
 }
 
 export async function createReservation(payload) {
-  const res = await fetch(`${API_BASE}/reserve`, {
+  return fetchJSON(`${API_BASE}/reserve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  return res.json();
 }
 
 export async function listReservations(date) {
   const params = date ? `?date=${encodeURIComponent(date)}` : '';
-  const res = await fetch(`${API_BASE}/reservations${params}`);
-  return res.json();
+  return fetchJSON(`${API_BASE}/reservations${params}`);
 }
 
 export async function cancelReservation(id) {
-  const res = await fetch(`${API_BASE}/reservations/${id}`, { method: 
-'DELETE' });
-  return res.json();
+  return fetchJSON(`${API_BASE}/reservations/${id}`, { method: 'DELETE' });
 }
+
 export async function getTableReservations({ date, mealType, timeSlot }) {
   const params = new URLSearchParams({ date, mealType, timeSlot });
-  const res = await fetch(`${API_BASE}/tableReservations?${params.toString()}`);
-  return res.json();
+  return fetchJSON(`${API_BASE}/tableReservations?${params.toString()}`);
 }
-
-
